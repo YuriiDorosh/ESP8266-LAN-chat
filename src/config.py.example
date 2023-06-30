@@ -1,2 +1,3 @@
-ssid: str= ""
-password: str = ""
+# Configuration for Wi-Fi network connection
+ssid: str = ""  # Enter the Wi-Fi network SSID (Service Set Identifier) here
+password: str = ""  # Enter the Wi-Fi network password here

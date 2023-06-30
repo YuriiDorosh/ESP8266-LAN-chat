@@ -1,7 +1,6 @@
 import utime
 from machine import Pin
 
-
 try:
     import usocket as socket
 except ImportError:
@@ -10,6 +9,12 @@ except ImportError:
 
 class WebServer:
     def __init__(self, port=9128):
+        """
+        Initialize the WebServer instance.
+
+        Parameters:
+        - port (int): The port number on which the server will listen for incoming connections. Default is 9128.
+        """
         self.led = Pin(2, Pin.OUT)
         self.messages = []
         self.port = port
@@ -17,10 +22,25 @@ class WebServer:
 
     @staticmethod
     def decode_message(encoded_message):
+        """
+        Decode the URL-encoded message.
+
+        Parameters:
+        - encoded_message (str): The URL-encoded message.
+
+        Returns:
+        - message (str): The decoded message.
+        """
         message = encoded_message.replace("%20", " ")
         return message
 
     def save_message(self, message):
+        """
+        Save a new message along with its timestamp to the messages list and file.
+
+        Parameters:
+        - message (str): The message to be saved.
+        """
         timestamp = utime.localtime()
         timestamp_str = "{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(
             timestamp[0],
@@ -35,6 +55,9 @@ class WebServer:
             file.write(message + "," + timestamp_str + "\n")
 
     def read_messages(self):
+        """
+        Read messages from the messages file and populate the messages list.
+        """
         with open("messages.txt", "r") as file:
             for line in file:
                 parts = line.strip().split(",")
@@ -43,6 +66,12 @@ class WebServer:
                     self.messages.append((message, timestamp))
 
     def web_page(self):
+        """
+        Generate the HTML content for the web page.
+
+        Returns:
+        - html (str): The HTML content of the web page.
+        """
         html = """<html>
         <head>
                <title>ESP8266 Web Server</title>
@@ -108,6 +137,15 @@ input[type="text"] {
         return html
 
     def handle_request(self, conn, request):
+        """
+        Handle an incoming HTTP request.
+
+        Parameters:
+        - conn (socket.socket): The socket connection object for the client.
+        - request (bytes): The received HTTP request.
+
+        Note: This method assumes the request is encoded in UTF-8.
+        """
         request = request.decode("utf-8")  # Decode the request from bytes to string
 
         message_start = request.find("/message?message=")
@@ -135,6 +173,9 @@ input[type="text"] {
         conn.close()
 
     def run(self):
+        """
+        Start the web server and listen for incoming connections.
+        """
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind(("", self.port))
         s.listen(5)
